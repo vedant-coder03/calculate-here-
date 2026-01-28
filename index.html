@@ -11,6 +11,23 @@
         button:hover { background: #444; transform: translateY(-2px); }
         .orange { background: #ff9500; }
         .orange:hover { background: #ffaa33; }
+
+        /* Added History Styling */
+        .history-section {
+            margin-top: 20px;
+            color: #888;
+            font-size: 14px;
+            max-height: 100px;
+            overflow-y: auto;
+            border-top: 1px solid #333;
+            padding-top: 10px;
+        }
+        .history-item {
+            cursor: pointer;
+            padding: 5px 0;
+            border-bottom: 1px solid #222;
+        }
+        .history-item:hover { color: #00ff88; }
     </style>
 </head>
 <body>
@@ -40,20 +57,46 @@
             <button onclick="press('0')" style="grid-column: span 2;">0</button>
             <button onclick="press('.')">.</button>
         </div>
+
+        <div class="history-section">
+            <strong>History (Click to reuse)</strong>
+            <div id="history-list"></div>
+        </div>
     </div>
 
     <script>
         let screen = document.getElementById('screen');
+        let historyList = document.getElementById('history-list');
+
         function press(v) { screen.value += v; }
         function clr() { screen.value = ''; }
         function back() { screen.value = screen.value.slice(0, -1); }
+
         function solve() {
             try {
-                // This replaces the Python eval() with JS eval()
-                screen.value = eval(screen.value);
+                let expression = screen.value;
+                let result = eval(screen.value);
+                
+                // Add to History
+                addHistory(expression + " = " + result);
+                
+                screen.value = result;
             } catch {
                 screen.value = "Error";
             }
+        }
+
+        function addHistory(text) {
+            let div = document.createElement("div");
+            div.className = "history-item";
+            div.innerText = text;
+            
+            // If user clicks history, it puts the result back on screen
+            div.onclick = function() {
+                screen.value = text.split('=')[1].trim();
+            };
+
+            historyList.prepend(div); // Newest on top
         }
     </script>
 </body>
